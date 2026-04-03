@@ -1,183 +1,108 @@
-// DOM refs
-const form = document.getElementById('cardForm');
-const nameI = document.getElementById('name');
-const titleI = document.getElementById('title');
-const companyI = document.getElementById('company');
-const phoneI = document.getElementById('phone');
-const emailI = document.getElementById('email');
-const githubI = document.getElementById('github');
-const linkdinI = document.getElementById('linkdin');
-const avatarI = document.getElementById('avatar');
-const themeI = document.getElementById('theme');
-
-const cardName = document.getElementById('cardName');
-const cardTitle = document.getElementById('cardTitle');
-const cardCompany = document.getElementById('cardCompany');
-const cardContact = document.getElementById('cardContact');
-const cardAvatar = document.getElementById('cardAvatar');
-const cardPreview = document.getElementById('cardPreview');
-const qrContainer = document.getElementById('qrcode');
-
-const downloadVcardBtn = document.getElementById('downloadVcard');
-const generateQRBtn = document.getElementById('generateQR');
-const downloadPNGBtn = document.getElementById('downloadPNG');
-// const exportHTMLBtn = document.getElementById('exportHTML');
-
-let avatarData = ''; // dataURL
-let qrcode = null;
-
-// update preview from inputs
-function updatePreview(){
-  cardName.textContent = nameI.value || 'Your Name';
-  cardTitle.textContent = titleI.value || 'Job Title';
-  cardCompany.textContent = companyI.value || '';
-  const contacts = [];
-  if(phoneI.value) contacts.push('📞 ' + phoneI.value);
-  if(emailI.value) contacts.push('✉️ ' + emailI.value);
-  if(githubI.value) contacts.push('🔗 ' + githubI.value);
-  if(linkdinI.value) contacts.push('🔗 ' + linkdinI.value);
-  cardContact.textContent = contacts.join(' • ');
-  if(avatarData) cardAvatar.src = avatarData;
-  else cardAvatar.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><rect width='100%' height='100%' fill='${themeI.value}'/></svg>`);
-  document.documentElement.style.setProperty('--accent', themeI.value || '#0ea5a4');
-  // save
-  saveToLocal();
-}
-
-// avatar file -> dataURL
-avatarI.addEventListener('change', e=>{
-  const f = e.target.files[0];
-  if(!f) return;
-  const r = new FileReader();
-  r.onload = ev => { avatarData = ev.target.result; updatePreview(); };
-  r.readAsDataURL(f);
-});
-
-// input listeners
-[ nameI, titleI, companyI, phoneI, emailI, linkdinI, githubI, themeI ].forEach(el=>el.addEventListener('input', updatePreview));
-
-// localStorage save/load
-function saveToLocal(){
-  const data = {
-    name: nameI.value, title: titleI.value, company: companyI.value,
-    phone: phoneI.value, email: emailI.value, linkdin: linkdinI.value,
-    github: githubI.value, theme: themeI.value, avatar: avatarData
-  };
-  localStorage.setItem('dbc_card', JSON.stringify(data));
-}
-function loadFromLocal(){
-  const raw = localStorage.getItem('dbc_card');
-  if(!raw) return;
-  const d = JSON.parse(raw);
-  nameI.value = d.name||'';
-  titleI.value = d.title||'';
-  companyI.value = d.company||'';
-  phoneI.value = d.phone||'';
-  emailI.value = d.email||'';
-  githubI.value = d.github||'';
-  linkdinI.value = d.linkdin||'';
-  themeI.value = d.theme||'#0ea5a4';
-  avatarData = d.avatar||'';
-  updatePreview();
-}
-
-// generate vCard text
-function buildVCard(){
-  const lines = [
-    'BEGIN:VCARD',
-    'VERSION:3.0',
-    `FN:${nameI.value||''}`,
-    `TITLE:${titleI.value||''}`,
-    `ORG:${companyI.value||''}`,
-  ];
-  if(phoneI.value) lines.push(`TEL;TYPE=CELL:${phoneI.value}`);
-  if(emailI.value) lines.push(`EMAIL:${emailI.value}`);
-  if(githubI.value) lines.push(`URL:${githubI.value}`);
-  if(linkdinI.value) lines.push(`URL:${linkdinI.value}`);
-  lines.push('END:VCARD');
-  return lines.join('\n');
-}
-
-generateQRBtn.addEventListener("click", () => {
-  qrContainer.innerHTML = ""; // clear old qr
-  const vcardData = buildVCard(); // build vcard text
-  new QRCode(qrContainer, {
-    text: vcardData,
-    width: 160,
-    height: 160
-  });
-});
 
 
-// new QRCode(document.getElementById("qrcode"), {
-//   // text: "BEGIN:VCARD\nVERSION:3.0\nFN:Test User\nTEL:1234567890\nEND:VCARD",
-//   // width: 160,
-//   // height: 160
-// });
+let currentColor = '#2d7cf6';
+  let photoDataURL = null;
+  let qrGenerated = false;
 
-// generic download helper
-function downloadFile(filename, content, mime='text/plain'){
-  const blob = new Blob([content], {type: mime});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click();
-  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 200);
-}
+  function updateCard() {
+    document.getElementById('card-name').textContent = document.getElementById('inp-name').value || 'Your Name';
+    document.getElementById('card-title').textContent = document.getElementById('inp-title').value || 'Job Title';
+    document.getElementById('card-company').textContent = document.getElementById('inp-company').value || 'Company';
 
-// download vCard
-downloadVcardBtn.addEventListener('click', ()=>{
-  const v = buildVCard();
-  downloadFile((nameI.value||'contact') + '.vcf', v, 'text/vcard');
-});
+    const contacts = [];
+    const phone = document.getElementById('inp-phone').value;
+    const email = document.getElementById('inp-email').value;
+    const github = document.getElementById('inp-github').value;
+    const linkedin = document.getElementById('inp-linkedin').value;
+    const portfolio = document.getElementById('inp-portfolio').value;
 
-// // generate QR (vCard content)
-// generateQRBtn.addEventListener('click', ()=>{
-//   // clear
-//   qrContainer.innerHTML = '';
-//   const v = buildVCard();
-//   // QRCode lib usage
-//   qrcode = new QRCode(qrContainer, { text: v, width: 160, height: 160 });
-// });
+    if (phone) contacts.push(`<div class="card-contact-item"><span class="icon">📞</span> ${phone}</div>`);
+    if (email) contacts.push(`<div class="card-contact-item"><span class="icon">✉️</span> <a href="mailto:${email}">${email}</a></div>`);
+    if (github) contacts.push(`<div class="card-contact-item"><span class="icon">🔗</span> <a href="${github}" target="_blank">${github}</a></div>`);
+    if (linkedin) contacts.push(`<div class="card-contact-item"><span class="icon">🔗</span> <a href="${linkedin}" target="_blank">${linkedin}</a></div>`);
+    if (portfolio) contacts.push(`<div class="card-contact-item"><span class="icon">🔗</span> <a href="${portfolio}" target="_blank">${portfolio}</a></div>`);
 
-// download PNG (html2canvas)
-downloadPNGBtn.addEventListener('click', ()=>{
-  html2canvas(cardPreview).then(canvas=>{
-    canvas.toBlob(blob=>{
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = (nameI.value||'business-card') + '.png';
-      document.body.appendChild(a); a.click();
-      setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 200);
+    document.getElementById('card-contacts').innerHTML = contacts.join('');
+  }
+
+  function updateColor(val) {
+    currentColor = val;
+    document.getElementById('color-hex').textContent = val;
+    document.getElementById('card-preview').style.setProperty('--theme-bg', val);
+    document.getElementById('card-bar').style.background = val;
+    document.getElementById('card-company').style.color = val;
+    // update top bar
+    document.getElementById('card-preview').style.setProperty('--theme-color', val);
+    document.querySelector('#card-preview::before');
+    // direct override via pseudo
+    const style = document.getElementById('dynamic-style') || (() => {
+      const s = document.createElement('style');
+      s.id = 'dynamic-style';
+      document.head.appendChild(s);
+      return s;
+    })();
+    style.textContent = `#card-preview::before { background-color: ${val} !important; }`;
+  }
+
+  function handlePhoto(input) {
+    const file = input.files[0];
+    if (!file) return;
+    document.getElementById('photo-name').textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = e => {
+      photoDataURL = e.target.result;
+      const img = document.getElementById('card-photo-img');
+      img.src = photoDataURL;
+      img.classList.add('visible');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function generateQR() {
+    const qrDiv = document.getElementById('qrcode');
+    qrDiv.innerHTML = '';
+    const phone = document.getElementById('inp-phone').value;
+    const email = document.getElementById('inp-email').value;
+    const name = document.getElementById('inp-name').value;
+    const qrText = `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${phone}\nEMAIL:${email}\nEND:VCARD`;
+    new QRCode(qrDiv, {
+      text: qrText,
+      width: 90, height: 90,
+      colorDark: '#0a1628',
+      colorLight: '#ffffff',
     });
-  });
-});
+    qrGenerated = true;
+  }
 
-// export standalone HTML file (simple)
-exportHTMLBtn.addEventListener('click', ()=>{
-  const html = `<!doctype html>
-  <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>${(nameI.value||'Card')}</title>
-  <style>
-    body{font-family:system-ui;padding:20px;background:#f3f4f6}
-    .card{display:flex;gap:12px;align-items:center;background:#fff;padding:16px;border-radius:10px;max-width:500px}
-    img{width:96px;height:96px;border-radius:10px;object-fit:cover;border:4px solid ${themeI.value}}
-  </style></head><body>
-  <div class="card">
-    <img src="${avatarData || ''}" alt="avatar"/>
-    <div>
-      <h2>${(nameI.value||'')}</h2>
-      <p>${(titleI.value||'')}</p>
-      <p>${(companyI.value||'')}</p>
-      <p>${(phoneI.value? 'Phone: ' + phoneI.value : '')}</p>
-      <p>${(emailI.value? 'Email: ' + emailI.value : '')}</p>
-      <p>${(linkdinI.value? '<a href="'+linkdinI.value+'">'+linkdinI.value+'</a>' : '')}</p>
-    </div>
-  </div>
-  </body></html>`;
-  downloadFile((nameI.value||'card') + '.html', html, 'text/html');
-});
+  function downloadVCard() {
+    const n = document.getElementById('inp-name').value;
+    const t = document.getElementById('inp-title').value;
+    const c = document.getElementById('inp-company').value;
+    const p = document.getElementById('inp-phone').value;
+    const e = document.getElementById('inp-email').value;
+    const g = document.getElementById('inp-github').value;
+    const l = document.getElementById('inp-linkedin').value;
+    const pf = document.getElementById('inp-portfolio').value;
+    const vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${n}\nTITLE:${t}\nORG:${c}\nTEL:${p}\nEMAIL:${e}\nURL:${g}\nURL:${l}\nEND:VCARD`;
+    const blob = new Blob([vcard], { type: 'text/vcard' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (n || 'contact') + '.vcf';
+    a.click();
+  }
 
-// init
-loadFromLocal();
-updatePreview();
+  function downloadPNG() {
+    const card = document.getElementById('card-preview');
+    import('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js').then(() => {
+      html2canvas(card, { scale: 2, backgroundColor: '#fff' }).then(canvas => {
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = 'business-card.png';
+        a.click();
+      });
+    }).catch(() => alert('html2canvas not loaded. Please include it for PNG export.'));
+  }
+
+  // init
+  updateCard();
+  updateColor('#2d7cf6');

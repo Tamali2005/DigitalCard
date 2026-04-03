@@ -1,55 +1,104 @@
-<!doctype html>
-<html lang="bn">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Digital Card</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Card Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="wrap">
-    <aside class="panel">
-      <h2>Card Details</h2>
-      <form id="cardForm">
-        <label>Your Name <input id="name" placeholder="Full name" /></label>
-        <label>Job title <input id="title" placeholder="Job title (e.g. Frontend Dev)" /></label>
-        <label>Company Name<input id="company" placeholder="Company" /></label>
-        <label>Phone <input id="phone" placeholder="Phone (e.g. +91...)" /></label>
-        <label >Email Address <input id="email" placeholder="Email" /></label>
-        <label>GitHub<input id="github" placeholder="GitHub Profile URL" /></label>
-        <label>Linkdin <input id="linkdin" placeholder="Linkdin PRofile URL" /></label>
-        <label>Profile Picture<input id="avatar" type="file" accept="image/*"/></label>
-        <label>Theme color <input id="theme" type="color" value="#0ea5a4"/></label>
-        <div class="btns">
-          <button id="generateQR" type="button">Generate QR</button>
-        </div>
-        <div class="btns">
-          <button id="downloadVcard" type="button">Download vCard</button>
-          <button id="downloadPNG" type="button">Download PNG</button>
-        </div>
-      </form>
-    </aside>
 
-    <main class="preview">
-      <div class="card" id="cardPreview">
-        <div class="left">
-          <img id="cardAvatar" alt="avatar"/>
-        </div>
-        <div class="right">
-          <h1 id="cardName">Your Name</h1>
-          <p id="cardTitle">Job Title</p>
-          <p id="cardCompany">Company</p>
-          <p id="cardContact"></p>
-          <div id="qrcode"></div>
-        </div>
+<div class="wrapper">
+  <!-- FORM -->
+  <div class="form-panel">
+    <h2>Card Details</h2>
+
+    <div class="field">
+      <label>Your Name</label>
+      <input type="text" id="inp-name" placeholder="e.g. John Smith" oninput="updateCard()">
+    </div>
+    <div class="field">
+      <label>Job Title</label>
+      <input type="text" id="inp-title" placeholder="e.g. Frontend Developer" oninput="updateCard()">
+    </div>
+    <div class="field">
+      <label>Company Name</label>
+      <input type="text" id="inp-company" placeholder="e.g. Google Inc." oninput="updateCard()">
+    </div>
+    <div class="field">
+      <label>Phone</label>
+      <input type="tel" id="inp-phone" placeholder="e.g. +91 98765 43210" oninput="updateCard()">
+    </div>
+    <div class="field">
+      <label>Email Address</label>
+      <input type="email" id="inp-email" placeholder="e.g. john@example.com" oninput="updateCard()">
+    </div>
+    <div class="field">
+      <label>GitHub</label>
+      <input type="url" id="inp-github" placeholder="e.g. https://github.com/username" oninput="updateCard()">
+    </div>
+    <div class="field">
+      <label>LinkedIn</label>
+      <input type="url" id="inp-linkedin" placeholder="e.g. https://linkedin.com/in/username" oninput="updateCard()">
+    </div>
+     <div class="field">
+      <label>Portfolio</label>
+      <input type="url" id="inp-portfolio" placeholder="e.g. https://your-portfolio.com" oninput="updateCard()">
+    </div>
+    <div class="field">
+      <label>Profile Picture</label>
+      <div class="file-row" onclick="document.getElementById('inp-photo').click()">
+        <input type="file" id="inp-photo" accept="image/*" onchange="handlePhoto(this)">
+        <span class="file-label-btn">Choose file</span>
+        <span class="file-name" id="photo-name">No file chosen</span>
       </div>
-    </main>
+    </div>
+    <div class="field">
+      <label>Theme Color</label>
+      <div class="color-row">
+        <input type="color" id="inp-color" value="#2d7cf6" oninput="updateColor(this.value)">
+        <span class="color-hex" id="color-hex">#2d7cf6</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="btn btn-primary" onclick="generateQR()">⬡ Generate QR</button>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="downloadVCard()">Download vCard</button>
+      <button class="btn btn-secondary" onclick="downloadPNG()">Download PNG</button>
+    </div>
   </div>
 
-  <!-- libs -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="script.js"></script>
+  <!-- PREVIEW -->
+  <div class="preview-panel">
+    <div class="preview-label">Live Preview</div>
+
+    <div id="card-preview">
+      <div class="card-top">
+        <img class="card-photo" id="card-photo-img" src="" alt="Profile">
+        <div class="card-info">
+          <div class="card-name" id="card-name">Your Name</div>
+          <div class="card-title" id="card-title">Job Title</div>
+          <div class="card-company" id="card-company">Company</div>
+        </div>
+      </div>
+
+      <div class="card-contacts" id="card-contacts"></div>
+
+      <div class="card-bottom">
+        <div>
+          <div class="card-accent-bar" id="card-bar"></div>
+        </div>
+        <div id="qrcode"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+
 </body>
 </html>
