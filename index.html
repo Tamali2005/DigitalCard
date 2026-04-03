@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Digital Card</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+  <div class="wrap">
+    <aside class="panel">
+      <h2>Card Details</h2>
+      <form id="cardForm">
+        <label>Your Name <input id="name" placeholder="Full name" /></label>
+        <label>Job title <input id="title" placeholder="Job title (e.g. Frontend Dev)" /></label>
+        <label>Company Name<input id="company" placeholder="Company" /></label>
+        <label>Phone <input id="phone" placeholder="Phone (e.g. +91...)" /></label>
+        <label >Email Address <input id="email" placeholder="Email" /></label>
+        <label>GitHub<input id="github" placeholder="GitHub Profile URL" /></label>
+        <label>Linkdin <input id="linkdin" placeholder="Linkdin PRofile URL" /></label>
+        <label>Profile Picture<input id="avatar" type="file" accept="image/*"/></label>
+        <label>Theme color <input id="theme" type="color" value="#0ea5a4"/></label>
+        <div class="btns">
+          <button id="generateQR" type="button">Generate QR</button>
+        </div>
+        <div class="btns">
+          <button id="downloadVcard" type="button">Download vCard</button>
+          <button id="downloadPNG" type="button">Download PNG</button>
+        </div>
+      </form>
+    </aside>
+
+    <main class="preview">
+      <div class="card" id="cardPreview">
+        <div class="left">
+          <img id="cardAvatar" alt="avatar"/>
+        </div>
+        <div class="right">
+          <h1 id="cardName">Your Name</h1>
+          <p id="cardTitle">Job Title</p>
+          <p id="cardCompany">Company</p>
+          <p id="cardContact"></p>
+          <div id="qrcode"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- libs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
