@@ -4,101 +4,173 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Business Card Generator</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="wrapper">
-  <!-- FORM -->
-  <div class="form-panel">
-    <h2>Card Details</h2>
+<div class="app">
 
-    <div class="field">
+  <!-- LEFT PANEL -->
+  <div class="left">
+    <div class="panel-title">Card Details</div>
+
+    <!-- YOUR NAME full width -->
+    <div class="field-group">
       <label>Your Name</label>
-      <input type="text" id="inp-name" placeholder="e.g. John Smith" oninput="updateCard()">
+      <input type="text" id="inp-name" placeholder="e.g. John Smith">
     </div>
-    <div class="field">
-      <label>Job Title</label>
-      <input type="text" id="inp-title" placeholder="e.g. Frontend Developer" oninput="updateCard()">
-    </div>
-    <div class="field">
-      <label>Company Name</label>
-      <input type="text" id="inp-company" placeholder="e.g. Google Inc." oninput="updateCard()">
-    </div>
-    <div class="field">
-      <label>Phone</label>
-      <input type="tel" id="inp-phone" placeholder="e.g. +91 98765 43210" oninput="updateCard()">
-    </div>
-    <div class="field">
-      <label>Email Address</label>
-      <input type="email" id="inp-email" placeholder="e.g. john@example.com" oninput="updateCard()">
-    </div>
-    <div class="field">
-      <label>GitHub</label>
-      <input type="url" id="inp-github" placeholder="e.g. https://github.com/username" oninput="updateCard()">
-    </div>
-    <div class="field">
-      <label>LinkedIn</label>
-      <input type="url" id="inp-linkedin" placeholder="e.g. https://linkedin.com/in/username" oninput="updateCard()">
-    </div>
-     <div class="field">
-      <label>Portfolio</label>
-      <input type="url" id="inp-portfolio" placeholder="e.g. https://your-portfolio.com" oninput="updateCard()">
-    </div>
-    <div class="field">
-      <label>Profile Picture</label>
-      <div class="file-row" onclick="document.getElementById('inp-photo').click()">
-        <input type="file" id="inp-photo" accept="image/*" onchange="handlePhoto(this)">
-        <span class="file-label-btn">Choose file</span>
-        <span class="file-name" id="photo-name">No file chosen</span>
+
+    <!-- JOB TITLE + COMPANY NAME -->
+    <div class="field-row">
+      <div>
+        <label>Job Title</label>
+        <input type="text" id="inp-title" placeholder="e.g. Frontend Developer">
       </div>
-    </div>
-    <div class="field">
-      <label>Theme Color</label>
-      <div class="color-row">
-        <input type="color" id="inp-color" value="#2d7cf6" oninput="updateColor(this.value)">
-        <span class="color-hex" id="color-hex">#2d7cf6</span>
+      <div>
+        <label>Company Name</label>
+        <input type="text" id="inp-company" placeholder="e.g. Google Inc.">
       </div>
     </div>
 
-    <div class="divider"></div>
+    <!-- PHONE + EMAIL -->
+    <div class="field-row">
+      <div>
+        <label>Phone</label>
+        <input type="tel" id="inp-phone" placeholder="e.g. +91 98765 43210">
+      </div>
+      <div>
+        <label>Email Address</label>
+        <input type="email" id="inp-email" placeholder="e.g. john@example.com">
+      </div>
+    </div>
 
-    <button class="btn btn-primary" onclick="generateQR()">⬡ Generate QR</button>
+    <!-- GITHUB + LINKEDIN -->
+    <div class="field-row" style="margin-bottom:20px">
+      <div>
+        <label>GitHub</label>
+        <input type="url" id="inp-github" placeholder="e.g. github.com/username">
+      </div>
+      <div>
+        <label>LinkedIn</label>
+        <input type="url" id="inp-linkedin" placeholder="e.g. linkedin.com/in/username">
+      </div>
+    </div>
+
+    <!-- PROFILE PICTURE + THEME COLOR -->
+    <div class="bottom-row">
+      <div>
+        <label>Profile Picture</label>
+        <div class="file-wrap" id="file-trigger">
+          <input type="file" id="inp-photo" accept="image/*">
+          <span class="choose-btn">CHOOSE</span>
+          <span class="file-label" id="photo-name">NO FILE CHOSEN</span>
+        </div>
+      </div>
+      <div>
+        <label>Theme Color</label>
+        <div class="color-wrap">
+          <input type="color" id="inp-color" value="#2d6fff">
+          <span class="color-hex" id="color-hex">#2d6fff</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUTTONS -->
     <div class="btn-row">
-      <button class="btn btn-secondary" onclick="downloadVCard()">Download vCard</button>
-      <button class="btn btn-secondary" onclick="downloadPNG()">Download PNG</button>
+      <button class="btn btn-blue" id="btn-qr">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3m0 4h4m-4-4v4m4-7h-4"/></svg>
+        QR Code
+      </button>
+      <button class="btn btn-ghost" id="btn-vcf">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        vCard
+      </button>
+      <button class="btn btn-ghost" id="btn-png">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        PNG
+      </button>
     </div>
+
   </div>
 
-  <!-- PREVIEW -->
-  <div class="preview-panel">
-    <div class="preview-label">Live Preview</div>
+  <!-- RIGHT PANEL -->
+  <div class="right">
+    <div class="preview-label">
+      <span class="preview-dot"></span>
+      Live Preview
+    </div>
 
+    <!-- BUSINESS CARD -->
     <div id="card-preview">
-      <div class="card-top">
-        <img class="card-photo" id="card-photo-img" src="" alt="Profile">
-        <div class="card-info">
-          <div class="card-name" id="card-name">Your Name</div>
-          <div class="card-title" id="card-title">Job Title</div>
-          <div class="card-company" id="card-company">Company</div>
+
+      <!-- BLUE SIDEBAR -->
+      <div class="card-left" id="card-left">
+        <div class="card-left-bg"></div>
+        <div class="avatar-ring">
+          <span class="avatar-icon" id="avatar-icon">&#128100;</span>
+          <img id="card-img" src="" alt="Profile">
         </div>
+        <div class="card-dots-left">
+          <div class="cdot"></div>
+          <div class="cdot"></div>
+          <div class="cdot"></div>
+        </div>
+        <div class="card-wm">Professional Card</div>
       </div>
 
-      <div class="card-contacts" id="card-contacts"></div>
-
-      <div class="card-bottom">
-        <div>
-          <div class="card-accent-bar" id="card-bar"></div>
+      <!-- WHITE RIGHT -->
+      <div class="card-right">
+        <div class="card-name" id="card-name">Your Name</div>
+        <div class="card-title" id="card-title">JOB TITLE</div>
+        <div class="card-company-badge" id="card-co">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          Company
         </div>
-        <div id="qrcode"></div>
+        <div class="card-divider"></div>
+
+        <div class="card-contacts" id="card-contacts">
+          <!-- phone -->
+          <div class="contact-row" id="crow-phone">
+            <div class="contact-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.93 19.79 19.79 0 01.22 1.32 2 2 0 012.22 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.66-.66a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+            </div>
+            <span class="contact-val" id="val-phone"><span class="contact-empty">–</span></span>
+          </div>
+          <!-- email -->
+          <div class="contact-row" id="crow-email">
+            <div class="contact-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <span class="contact-val" id="val-email"><span class="contact-empty">–</span></span>
+          </div>
+          <!-- github -->
+          <div class="contact-row" id="crow-github">
+            <div class="contact-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            </div>
+            <span class="contact-val" id="val-github"><span class="contact-empty">–</span></span>
+          </div>
+          <!-- linkedin -->
+          <div class="contact-row" id="crow-linkedin">
+            <div class="contact-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+            </div>
+            <span class="contact-val" id="val-linkedin"><span class="contact-empty">–</span></span>
+          </div>
+        </div>
+
+        <div id="card-qr" class="card-qr"></div>
+
+        <div class="card-placeholder-text" id="card-placeholder">Fill in the form to see your details...</div>
       </div>
+
     </div>
   </div>
+
 </div>
 
 <script src="script.js"></script>
-
 </body>
 </html>
