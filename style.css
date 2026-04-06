@@ -499,3 +499,151 @@
     background: #1e2d42;
     align-self: stretch;
   }
+
+  /* ═══════════════════════════════
+     RESPONSIVE — TABLET & MOBILE
+  ═══════════════════════════════ */
+
+  /* Tablet: stack panels vertically */
+  @media (max-width: 900px) {
+    body {
+      align-items: flex-start;
+      padding: 16px;
+    }
+
+    .app {
+      grid-template-columns: 1fr;
+      min-height: unset;
+      border-radius: 16px;
+    }
+
+    .left {
+      border-right: none;
+      border-bottom: 1px solid #1e2d42;
+      padding: 28px 24px;
+    }
+
+    .right {
+      padding: 28px 24px;
+    }
+
+    #card-preview {
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+
+  /* Mobile: single column everything */
+  @media (max-width: 600px) {
+    body { padding: 12px; }
+
+    .app {
+      border-radius: 14px;
+    }
+
+    .left {
+      padding: 22px 16px;
+    }
+
+    .right {
+      padding: 20px 16px;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    /* all 2-col field rows → single col on mobile */
+    .field-row {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .bottom-row {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    /* buttons row → 1 col QR full, vCard+PNG side by side */
+    .btn-row {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .btn-row .btn:first-child {
+      grid-column: 1 / -1;
+    }
+
+    /* card itself stacks: blue top, white bottom */
+    #card-preview {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      max-width: 100%;
+    }
+
+    .card-left {
+      width: 100% !important;
+      min-width: unset !important;
+      max-width: unset !important;
+      flex-direction: row;
+      align-items: center;
+      padding: 20px 24px;
+      gap: 16px;
+      clip-path: none;
+      border-radius: 0;
+    }
+
+    /* remove wave on mobile */
+    .card-left::after { display: none; }
+
+    .avatar-ring {
+      width: 70px; height: 70px;
+      flex-shrink: 0;
+    }
+
+    .avatar-ring img {
+      width: 70px !important; height: 70px !important;
+      min-width: 70px !important; min-height: 70px !important;
+      max-width: 70px !important; max-height: 70px !important;
+    }
+
+    .avatar-icon { font-size: 28px; }
+
+    .card-dots-left { display: none; }
+
+    .card-wm {
+      font-size: 7px;
+    }
+
+    .card-right {
+      padding: 18px 18px 16px;
+    }
+
+    .card-name { font-size: 19px; }
+    .card-title { font-size: 9px; }
+
+    /* QR + contacts side by side still, but smaller */
+    .contact-qr-row {
+      gap: 10px;
+    }
+
+    .contact-val { font-size: 10.5px; }
+
+    #card-qr canvas,
+    #card-qr img {
+      width: 70px !important;
+      height: 70px !important;
+    }
+  }
+
+  /* Very small phones */
+  @media (max-width: 380px) {
+    .btn-row {
+      grid-template-columns: 1fr;
+    }
+
+    .card-name { font-size: 17px; }
+
+    .contact-val { font-size: 10px; }
+  }
